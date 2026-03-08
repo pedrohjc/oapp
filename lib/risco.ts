@@ -164,8 +164,13 @@ export function calcularRisco(
   }
 
   score = Math.min(score, 100);
-  const nivel: NivelAlerta =
-    score >= 55 ? "atencao" : score >= 20 ? "observacao" : "normal";
+
+  // Nível derivado do alerta mais grave (evita inconsistência entre painel e badges individuais)
+  const nivel: NivelAlerta = alertas.some((a) => a.nivel === "atencao")
+    ? "atencao"
+    : alertas.some((a) => a.nivel === "observacao")
+    ? "observacao"
+    : "normal";
 
   return { indice: score, nivel, alertas };
 }

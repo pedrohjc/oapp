@@ -141,12 +141,15 @@ export default async function ParlamentarPerfilPage({
 
           {/* Ações */}
           <div className="flex gap-3 flex-shrink-0">
-            <button className="px-6 py-2.5 bg-[#137fec] text-white font-semibold rounded-lg shadow-md shadow-[#137fec]/25 hover:opacity-90 transition-all">
-              Seguir
-            </button>
-            <button className="px-6 py-2.5 bg-white border border-slate-200 font-semibold rounded-lg hover:bg-slate-50 transition-all text-slate-700">
-              Compartilhar
-            </button>
+            <a
+              href={`https://dadosabertos.camara.leg.br/api/v2/deputados/${id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 bg-white border border-slate-200 font-semibold rounded-lg hover:bg-slate-50 transition-all text-slate-700 text-sm flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-base">open_in_new</span>
+              Fonte oficial
+            </a>
           </div>
         </section>
 
@@ -321,20 +324,40 @@ export default async function ParlamentarPerfilPage({
               </div>
             </div>
 
-            {/* Relatório */}
-            <div className="bg-slate-900 text-white p-6 rounded-2xl relative overflow-hidden">
-              <div className="relative z-10">
-                <h4 className="text-lg font-bold mb-2">Relatório de Transparência</h4>
-                <p className="text-slate-400 text-sm mb-5">
-                  Dossiê completo com dados da Câmara, TSE e Receita Federal.
-                </p>
-                <button className="w-full py-3 bg-[#137fec] rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-[#137fec]/90 transition-all text-sm">
-                  <span className="material-symbols-outlined text-sm">download</span>
-                  Baixar PDF
-                </button>
-              </div>
-              <div className="absolute -bottom-6 -right-6 opacity-10">
-                <span className="material-symbols-outlined text-[120px]">article</span>
+            {/* Links oficiais */}
+            <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl">
+              <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base text-slate-400">link</span>
+                Fontes Oficiais
+              </h4>
+              <div className="space-y-2">
+                <a
+                  href={`https://dadosabertos.camara.leg.br/api/v2/deputados/${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-[#137fec] hover:underline"
+                >
+                  <span className="material-symbols-outlined text-sm">open_in_new</span>
+                  API Câmara dos Deputados
+                </a>
+                <a
+                  href={`https://www.camara.leg.br/deputados/${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-[#137fec] hover:underline"
+                >
+                  <span className="material-symbols-outlined text-sm">open_in_new</span>
+                  Perfil na Câmara.leg.br
+                </a>
+                <a
+                  href={`https://www.camara.leg.br/cota-parlamentar/?nuDeputadoId=${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-[#137fec] hover:underline"
+                >
+                  <span className="material-symbols-outlined text-sm">open_in_new</span>
+                  Cota Parlamentar (CEAP)
+                </a>
               </div>
             </div>
 

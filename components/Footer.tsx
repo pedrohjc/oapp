@@ -1,7 +1,20 @@
+import Link from "next/link";
+
 const links = {
-  Explorar: ["Gastos por Partido", "Quadro de Horários", "Mapa de Despesas"],
-  Dados: ["Portal da Transparência", "API Pública", "Metodologia"],
-  Institucional: ["Quem Somos", "Contato", "Privacidade"],
+  Explorar: [
+    { label: "Gastos por Partido", href: "/ranking" },
+    { label: "Ranking de Parlamentares", href: "/ranking" },
+    { label: "Alertas de Transparência", href: "/radar" },
+  ],
+  Dados: [
+    { label: "Portal da Transparência", href: "https://portaltransparencia.gov.br", external: true },
+    { label: "API da Câmara", href: "https://dadosabertos.camara.leg.br", external: true },
+    { label: "Metodologia", href: "/sobre" },
+  ],
+  Institucional: [
+    { label: "Sobre o OAPP", href: "/sobre" },
+    { label: "Reportar Erro", href: "https://github.com/pedrohjc/oapp/issues", external: true },
+  ],
 };
 
 export default function Footer() {
@@ -28,10 +41,21 @@ export default function Footer() {
               <h4 className="font-bold mb-4 text-slate-900 text-sm">{section}</h4>
               <ul className="space-y-2">
                 {items.map((item) => (
-                  <li key={item}>
-                    <a href="#" className="text-sm text-slate-500 hover:text-[#137fec] transition-colors">
-                      {item}
-                    </a>
+                  <li key={item.label}>
+                    {"external" in item && item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-slate-500 hover:text-[#137fec] transition-colors"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link href={item.href} className="text-sm text-slate-500 hover:text-[#137fec] transition-colors">
+                        {item.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

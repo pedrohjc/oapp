@@ -196,7 +196,7 @@ export default function SobrePage() {
               registre uma issue no repositório público do projeto no GitHub. Sua contribuição é importante.
             </p>
             <a
-              href="https://github.com"
+              href="https://github.com/pedrohjc/oapp/issues"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors"

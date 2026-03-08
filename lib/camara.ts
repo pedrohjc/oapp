@@ -153,9 +153,9 @@ export async function getDeputadoDetalhe(id: number): Promise<DeputadoDetalhe> {
   return json.dados as DeputadoDetalhe;
 }
 
-export async function getDespesasDeputado(id: number, ano?: number): Promise<Despesa[]> {
+export async function getDespesasDeputado(id: number, ano?: number, itens = 20): Promise<Despesa[]> {
   return get<Despesa[]>(`/deputados/${id}/despesas`, {
-    itens: 20,
+    itens,
     ordem: "DESC",
     ordenarPor: "dataDocumento",
     ...(ano && { ano }),
@@ -188,6 +188,32 @@ export async function getDiscursosDeputado(id: number): Promise<Discurso[]> {
 
 export async function getOrgaosDeputado(id: number): Promise<Orgao[]> {
   return get<Orgao[]>(`/deputados/${id}/orgaos`, { itens: 10 });
+}
+
+// Busca todos os deputados paginando pela API (máx 100 por página, ~513 no total)
+export async function getTodosDeputados(): Promise<Deputado[]> {
+  const POR_PAGINA = 100;
+  const primeira = await get<Deputado[]>("/deputados", {
+    itens: POR_PAGINA,
+    pagina: 1,
+    ordenarPor: "nome",
+    ordem: "ASC",
+  });
+
+  if (primeira.length < POR_PAGINA) return primeira;
+
+  // Busca páginas 2–6 em paralelo (100 × 6 = 600 slots, suficiente para os ~513 deputados)
+  const extras = await Promise.allSettled(
+    [2, 3, 4, 5, 6].map((p) =>
+      get<Deputado[]>("/deputados", { itens: POR_PAGINA, pagina: p, ordenarPor: "nome", ordem: "ASC" })
+    )
+  );
+
+  const todos = [...primeira];
+  for (const r of extras) {
+    if (r.status === "fulfilled" && r.value.length > 0) todos.push(...r.value);
+  }
+  return todos;
 }
 
 export async function getDeputadosComTotalGastos(ano: number, itens = 50): Promise<

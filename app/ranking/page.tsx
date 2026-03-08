@@ -1,19 +1,24 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getDeputados, getDespesasDeputado, type Deputado } from "@/lib/camara";
+import { getTodosDeputados, getDespesasDeputado, type Deputado } from "@/lib/camara";
 import { getSenadores, type Senador } from "@/lib/senado";
 import { formatBRL, getInitials, anoAtual } from "@/lib/format";
+
+// Revalida o ranking a cada hora para não sobrecarregar a API da Câmara
+export const revalidate = 3600;
 
 type DeputadoRanking = Deputado & { totalGastos: number };
 
 async function fetchRankingDeputados(): Promise<DeputadoRanking[]> {
   try {
-    const deputados = await getDeputados({ itens: 30 });
+    // Busca todos os ~513 deputados (paginado) e os gastos de cada um em paralelo
+    const deputados = await getTodosDeputados();
     const ano = anoAtual();
     const comGastos = await Promise.allSettled(
       deputados.map(async (dep) => {
-        const despesas = await getDespesasDeputado(dep.id, ano);
+        // itens:200 garante cobertura de ~16 meses de despesas sem perder registros
+        const despesas = await getDespesasDeputado(dep.id, ano, 200);
         const total = despesas.reduce((acc, d) => acc + (d.valorLiquido ?? 0), 0);
         return { ...dep, totalGastos: total };
       })
@@ -142,7 +147,9 @@ export default async function RankingPage({ searchParams }: Props) {
           <section>
             <div className="flex items-center gap-3 mb-6">
               <h2 className="text-xl font-bold text-slate-900">Maiores Gastadores — Câmara</h2>
-              <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded-full">{deputados.length} deputados</span>
+              <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded-full">
+                top 30 de {deputados.length} deputados
+              </span>
             </div>
             {deputados.length === 0 ? (
               <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center text-slate-400">
@@ -160,7 +167,7 @@ export default async function RankingPage({ searchParams }: Props) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
-                    {deputados.map((dep, idx) => (
+                    {deputados.slice(0, 30).map((dep, idx) => (
                       <tr key={dep.id} className="hover:bg-slate-50/50 transition-colors">
                         <td className="px-6 py-4 text-sm font-bold text-slate-400 w-10">
                           {idx < 3 ? (

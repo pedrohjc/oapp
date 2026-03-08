@@ -17,10 +17,16 @@ export default async function BuscarPage({ searchParams }: Props) {
     query ? getSenadores() : Promise.resolve([]),
   ]);
 
-  // Filtra senadores pelo nome buscado
-  const senadores = todosSenadores.filter((s) =>
-    s.IdentificacaoParlamentar.NomeParlamentar.toLowerCase().includes(query.toLowerCase())
-  );
+  // Filtra senadores por nome, partido ou UF
+  const ql = query.toLowerCase();
+  const senadores = todosSenadores.filter((s) => {
+    const id = s.IdentificacaoParlamentar;
+    return (
+      id.NomeParlamentar.toLowerCase().includes(ql) ||
+      id.SiglaPartidoParlamentar?.toLowerCase() === ql ||
+      id.UfParlamentar?.toLowerCase() === ql
+    );
+  });
 
   const totalResultados = deputados.length + senadores.length;
 

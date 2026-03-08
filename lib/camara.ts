@@ -120,13 +120,26 @@ export async function getDeputados(params?: {
 }
 
 export async function buscarDeputados(query: string): Promise<Deputado[]> {
-  if (!query.trim()) return [];
-  return get<Deputado[]>("/deputados", {
-    nome: query.trim(),
-    itens: 20,
-    ordenarPor: "nome",
-    ordem: "ASC",
-  });
+  const q = query.trim();
+  if (!q) return [];
+
+  // Busca paralela por nome, partido e UF — a API aceita cada um separadamente
+  const [porNome, porPartido, porUf] = await Promise.all([
+    get<Deputado[]>("/deputados", { nome: q, itens: 20, ordenarPor: "nome", ordem: "ASC" }).catch(() => []),
+    get<Deputado[]>("/deputados", { siglaPartido: q.toUpperCase(), itens: 50, ordenarPor: "nome", ordem: "ASC" }).catch(() => []),
+    get<Deputado[]>("/deputados", { siglaUf: q.toUpperCase(), itens: 50, ordenarPor: "nome", ordem: "ASC" }).catch(() => []),
+  ]);
+
+  // Merge sem duplicatas, por ID
+  const vistos = new Set<number>();
+  const resultado: Deputado[] = [];
+  for (const dep of [...porNome, ...porPartido, ...porUf]) {
+    if (!vistos.has(dep.id)) {
+      vistos.add(dep.id);
+      resultado.push(dep);
+    }
+  }
+  return resultado.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 }
 
 export async function getDeputadoDetalhe(id: number): Promise<DeputadoDetalhe> {

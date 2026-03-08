@@ -94,6 +94,7 @@ async function get<T>(path: string, params: Record<string, string | number> = {}
   const res = await fetch(url.toString(), {
     next: { revalidate: 3600 },
     headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(8000),
   });
 
   if (!res.ok) throw new Error(`Câmara API error: ${res.status} ${path}`);
